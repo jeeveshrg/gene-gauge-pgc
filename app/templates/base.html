@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex" />
+    <title>{% block title %}GeneGauge{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/main.css') }}" />
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="site-header">
+      <div class="container header-row">
+        <a class="brand" href="/" aria-label="GeneGauge home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-name">GeneGauge</span>
+        </a>
+        <nav class="site-nav" aria-label="Main">
+          <a href="/" class="{{ 'is-active' if active == 'home' else '' }}">Home</a>
+          <a href="/calculator" class="{{ 'is-active' if active == 'calculator' else '' }}">Calculator</a>
+          <a href="/how-it-works" class="{{ 'is-active' if active == 'how' else '' }}">How it works</a>
+          <a href="/details" class="{{ 'is-active' if active == 'details' else '' }}">Details</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="container main-content">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-row">
+        <p class="footer-note">
+          Educational demo. Not a diagnosis. Not medical advice.
+          Sample data is simulated.
+        </p>
+        <p class="footer-meta">v{{ version }}</p>
+      </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

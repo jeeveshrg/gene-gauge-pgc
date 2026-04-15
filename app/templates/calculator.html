@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Calculator - GeneGauge{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1 class="page-title">Calculator</h1>
+  <p class="page-sub">
+    Pick values for each signal, or load a demo person. We will add them up
+    and show where the result lands against {{ population_size }} sample people.
+  </p>
+</section>
+
+<div class="calc-grid">
+  <section class="panel">
+    <header class="panel-head">
+      <h2 class="panel-title">Your signals</h2>
+      <div class="panel-actions">
+        <button id="load-demo" type="button" class="btn btn-ghost btn-sm">Load demo person</button>
+        <button id="reset" type="button" class="btn btn-ghost btn-sm">Reset to zero</button>
+      </div>
+    </header>
+    <p class="panel-hint">
+      Each signal is a small number: 0, 1, or 2. Think of it as "none", "some", or "a lot".
+    </p>
+    <form id="score-form" novalidate>
+      <ul class="signal-list">
+        {% for s in signals %}
+        <li class="signal-row" data-signal-id="{{ s.signal_id }}">
+          <div class="signal-label">
+            <span class="signal-name">{{ s.plain_label }}</span>
+            <span class="signal-sub">Counts {{ '%+.2f' | format(s.weight) }} per step</span>
+          </div>
+          <div class="stepper" role="group" aria-label="Value for {{ s.plain_label }}">
+            {% for v in [0, 1, 2] %}
+            <label class="step">
+              <input type="radio" name="{{ s.signal_id }}" value="{{ v }}" {% if v == 0 %}checked{% endif %} />
+              <span>{{ v }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Calculate score</button>
+      </div>
+    </form>
+  </section>
+
+  <aside class="panel results-panel" aria-live="polite">
+    <header class="panel-head">
+      <h2 class="panel-title">Your result</h2>
+    </header>
+
+    <div id="empty-state" class="empty-state">
+      <p>Pick your values and press <strong>Calculate score</strong>. Your result will show up here.</p>
+    </div>
+
+    <div id="result" class="result" hidden>
+      <div class="score-block">
+        <p class="score-label">Signal score</p>
+        <p class="score-value" id="score-value">&mdash;</p>
+        <p class="score-band"><span id="score-band" class="band">&mdash;</span></p>
+      </div>
+
+      <div class="compare-block">
+        <p class="compare-text" id="compare-text">&mdash;</p>
+        <div class="compare-track" aria-hidden="true">
+          <div class="compare-fill" id="compare-fill"></div>
+          <div class="compare-marker" id="compare-marker"></div>
+        </div>
+        <p class="compare-legend">
+          <span>Lower than most</span>
+          <span>Typical</span>
+          <span>Higher than most</span>
+        </p>
+      </div>
+
+      <div class="reasons-block">
+        <div class="reasons-col">
+          <h3 class="reasons-title">Biggest reasons your score moved up</h3>
+          <ul id="top-up" class="reasons-list"></ul>
+        </div>
+        <div class="reasons-col">
+          <h3 class="reasons-title">Biggest reasons your score moved down</h3>
+          <ul id="top-down" class="reasons-list"></ul>
+        </div>
+      </div>
+
+      <details class="details-block">
+        <summary>See details (for technical users)</summary>
+        <p class="details-note">
+          The score is a weighted sum across every signal. Below you can see
+          the full list of per-signal contributions.
+        </p>
+        <table class="details-table">
+          <thead>
+            <tr>
+              <th scope="col">Signal</th>
+              <th scope="col">Value</th>
+              <th scope="col">Weight</th>
+              <th scope="col">Contribution</th>
+            </tr>
+          </thead>
+          <tbody id="details-body"></tbody>
+        </table>
+      </details>
+
+      <p class="disclaimer">
+        This is a demo score based on sample inputs. It is not a diagnosis
+        and not medical advice.
+      </p>
+    </div>
+  </aside>
+</div>
+
+<div id="error-banner" class="banner banner-error" role="alert" hidden>
+  <span id="error-text">Something went wrong.</span>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ nonce }}" src="{{ url_for('static', path='/js/app.js') }}"></script>
+{% endblock %}
