@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}How it works - GeneGauge{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1 class="page-title">How it works</h1>
+  <p class="page-sub">In four short steps, with no jargon.</p>
+</section>
+
+<ol class="steps">
+  <li class="step-card">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h2 class="step-title">We look at many tiny signals</h2>
+      <p>A signal is just a small number per person. Each signal on its own says very little. Together, they can hint at a trend.</p>
+    </div>
+  </li>
+  <li class="step-card">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h2 class="step-title">We multiply each by how much it counts</h2>
+      <p>Some signals push a score up. Some push it down. Some barely count at all. Each one has a small weight.</p>
+    </div>
+  </li>
+  <li class="step-card">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h2 class="step-title">We add them all up</h2>
+      <p>The total is your one clear score. A single number you can read and compare.</p>
+    </div>
+  </li>
+  <li class="step-card">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <h2 class="step-title">We compare with a large group</h2>
+      <p>We simulate many sample people using the same math and see where your score lands. Lower than most, typical, or higher than most.</p>
+    </div>
+  </li>
+</ol>
+
+<section class="callout">
+  <h2 class="callout-title">What we do not do</h2>
+  <ul class="plain-list">
+    <li>We do not diagnose anything.</li>
+    <li>We do not use real personal data.</li>
+    <li>We do not sell, share, or store your inputs.</li>
+    <li>We do not pretend this is a medical tool.</li>
+  </ul>
+</section>
+{% endblock %}

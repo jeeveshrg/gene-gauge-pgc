@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}GeneGauge - A simple way to turn tiny signals into one clear score{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">GeneGauge</p>
+  <h1 class="hero-title">A simple way to turn tiny signals into one clear score.</h1>
+  <p class="hero-sub">
+    We look at a list of tiny signals, add them up, and show where your result lands
+    compared with many sample people. No jargon. No guesswork. No medical claims.
+  </p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="/calculator">Try the calculator</a>
+    <a class="btn btn-ghost" href="/how-it-works">How it works</a>
+  </div>
+</section>
+
+<section class="grid-3">
+  <article class="card">
+    <h2 class="card-title">1. Tiny signals</h2>
+    <p>Each person has many small signals. Some push a score up. Some push it down. On their own, none say very much.</p>
+  </article>
+  <article class="card">
+    <h2 class="card-title">2. Simple math</h2>
+    <p>We multiply each signal by how much it counts and add them together. That gives one number: your signal score.</p>
+  </article>
+  <article class="card">
+    <h2 class="card-title">3. Plain comparison</h2>
+    <p>We compare your score with a large group of sample people so you can see where you land - higher, typical, or lower.</p>
+  </article>
+</section>
+
+<section class="callout">
+  <h2 class="callout-title">What this is - and isn't</h2>
+  <p>
+    GeneGauge is an educational demo. It shows how weighted-sum scoring works
+    in a clean, friendly way. It is not a diagnosis, not medical advice, and
+    uses simulated sample data. If you ever want to see the technical
+    underpinnings, they live in the <a href="/details">Details</a> page.
+  </p>
+</section>
+{% endblock %}

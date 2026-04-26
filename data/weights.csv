@@ -1,0 +1,25 @@
+signal_id,plain_label,weight,direction_hint
+S001,Signal 1 - morning energy pattern,0.727,up
+S002,Signal 2 - sleep regularity pattern,-0.017,down
+S003,Signal 3 - caffeine response pattern,-0.328,down
+S004,Signal 4 - short-term memory cue,0.206,up
+S005,Signal 5 - stress recovery cue,-0.11,down
+S006,Signal 6 - endurance marker,-0.193,down
+S007,Signal 7 - focus marker,0.638,up
+S008,Signal 8 - appetite timing cue,0.321,up
+S009,Signal 9 - mood steadiness cue,0.097,up
+S010,Signal 10 - temperature comfort cue,-0.179,down
+S011,Signal 11 - hydration preference,-0.05,down
+S012,Signal 12 - light sensitivity cue,-0.409,down
+S013,Signal 13 - sound sensitivity cue,-0.255,down
+S014,Signal 14 - early-riser tendency,0.824,up
+S015,Signal 15 - late-night tendency,-0.073,down
+S016,Signal 16 - taste preference cue,-0.352,down
+S017,Signal 17 - scent sensitivity cue,-0.149,down
+S018,Signal 18 - fine-motor steadiness,0.199,up
+S019,Signal 19 - balance-and-posture cue,0.194,up
+S020,Signal 20 - reading stamina cue,-0.414,down
+S021,Signal 21 - verbal recall cue,-0.887,down
+S022,Signal 22 - spatial recall cue,-0.472,down
+S023,Signal 23 - calm-under-pressure cue,0.783,up
+S024,Signal 24 - social energy cue,-0.108,down
