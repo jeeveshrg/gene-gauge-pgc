@@ -1,6 +1,7 @@
 """FastAPI application exposing the GeneGauge PGC analysis engine.
 
 Endpoints:
+    GET  /health                          (plain health check, e.g. for Render)
     GET  /api/health
     GET  /api/datasets
     GET  /api/datasets/{dataset_id}/configs
@@ -47,7 +48,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten in production via env-driven config
+    allow_origins=config.cors_origins(),
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -66,6 +67,12 @@ def health() -> dict:
         "demo_mode": config.is_demo_mode(),
         "supabase": supabase_enabled(),
     }
+
+
+@app.get("/health")
+def health_root() -> dict:
+    """Plain health-check path for Render (and other platform) health checks."""
+    return {"status": "ok"}
 
 
 @app.get("/api/datasets")

@@ -8,6 +8,7 @@ Environment variables (all optional — the app runs in demo/mock mode without t
     SUPABASE_KEY             Supabase service/anon key
     GENEGAUGE_DATA_DIR       Override the bundled data directory
     GENEGAUGE_STORE_PATH     Path to the JSON analysis-history store
+    GENEGAUGE_CORS_ORIGINS   Comma-separated allowed CORS origins (default: localhost only)
 """
 
 from __future__ import annotations
@@ -36,6 +37,22 @@ STORE_PATH = Path(
 # ---------------------------------------------------------------------------
 GENOME_WIDE_SIGNIFICANCE = 5e-8
 SUGGESTIVE_SIGNIFICANCE = 1e-5
+
+
+def cors_origins() -> list[str]:
+    """Return the list of allowed CORS origins.
+
+    Defaults to localhost (frontend dev servers) when GENEGAUGE_CORS_ORIGINS is
+    unset. Set GENEGAUGE_CORS_ORIGINS to a comma-separated list (e.g. the
+    Vercel production domain) in deployed environments.
+    """
+    raw = os.environ.get("GENEGAUGE_CORS_ORIGINS", "").strip()
+    if not raw:
+        return [
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+        ]
+    return [origin.strip() for origin in raw.split(",") if origin.strip()]
 
 
 def is_demo_mode() -> bool:

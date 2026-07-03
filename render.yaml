@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: genegauge-pgc-backend
+    runtime: docker
+    plan: free
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: GENEGAUGE_DEMO_MODE
+        value: "1"
+      - key: GENEGAUGE_CORS_ORIGINS
+        # Comma-separated. Add your Vercel production domain here after the
+        # frontend is deployed, e.g.:
+        # http://localhost:3000,https://genegauge-pgc.vercel.app
+        value: "http://localhost:3000,http://127.0.0.1:3000"
