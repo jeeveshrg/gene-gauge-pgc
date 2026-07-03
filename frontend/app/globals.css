@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background-color: theme("colors.panel");
+  color: theme("colors.ink.DEFAULT");
+  font-feature-settings: "tnum" 1;
+}
+
+/* Genomic coordinates and identifiers render in monospace. */
+.coord {
+  font-family: theme("fontFamily.mono");
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+/* Dense, readable data tables with thin borders. */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+.data-table th,
+.data-table td {
+  border: 1px solid theme("colors.line");
+  padding: 0.375rem 0.625rem;
+  text-align: left;
+  vertical-align: top;
+}
+.data-table th {
+  background-color: theme("colors.panel");
+  font-weight: 600;
+  color: theme("colors.ink.muted");
+  white-space: nowrap;
+}
+.data-table tbody tr:nth-child(even) {
+  background-color: #fcfcfd;
+}
