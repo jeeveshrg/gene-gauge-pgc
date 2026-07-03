@@ -1,61 +1,31 @@
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-*.so
-*.egg
 *.egg-info/
-.eggs/
-build/
-dist/
-.Python
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Virtual envs
 .venv/
 venv/
-env/
-ENV/
-.python-version
-
-# Testing / coverage
 .pytest_cache/
-.coverage
-.coverage.*
-htmlcov/
-.tox/
-.nox/
-coverage.xml
-*.cover
+.mypy_cache/
 
-# IDE / editor
+# Node / Next.js
+node_modules/
+.next/
+out/
+npm-debug.log*
+next-env.d.ts
+*.tsbuildinfo
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Generated / runtime artifacts
+backend/data/analyses_store.json
+backend/demo_report.md
+*.pdf
+
+# OS / editor
+.DS_Store
 .idea/
 .vscode/
-*.swp
-*.swo
-.DS_Store
-
-# Environment / secrets
-.env
-.env.*
-!.env.example
-*.pem
-*.key
-secrets/
-
-# Logs / runtime
-*.log
-logs/
-*.pid
-
-# Local data overrides (keep the committed sample only)
-data/local/
-data/uploads/
-*.db
-*.sqlite
-*.sqlite3
-
-# OS
-Thumbs.db
