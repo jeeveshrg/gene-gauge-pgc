@@ -191,13 +191,40 @@ See `.env.example` for all variables.
 
 ---
 
-## Deployment notes
+## Deployment
 
-- **Frontend → Vercel:** set `NEXT_PUBLIC_API_BASE_URL` to your backend URL.
-- **Backend → Render/Railway/Fly.io:** run
-  `uvicorn app.main:app --host 0.0.0.0 --port $PORT`; set `HF_TOKEN` /
-  Supabase vars as needed. Restrict CORS origins for production.
-- **Supabase:** create a project and provide `SUPABASE_URL` / `SUPABASE_KEY`.
+Frontend on Vercel, backend on Render as a Dockerized FastAPI web service
+(not a serverless function — the backend depends on duckdb, pyarrow, scipy,
+and matplotlib, which don't fit serverless size/runtime constraints).
+
+1. **Deploy the frontend to Vercel.**
+   Import this repo in Vercel, set the project root to `frontend/`, and
+   deploy. Framework preset: Next.js (auto-detected).
+
+2. **Deploy the backend to Render as a Docker web service.**
+   In the Render dashboard, "New +" → "Web Service" → connect this repo.
+   Render will pick up [`render.yaml`](./render.yaml) (root directory
+   `backend/`, `Dockerfile` build, health check at `/health`). Alternatively
+   configure manually: root directory `backend`, environment `Docker`.
+   Note the resulting service URL, e.g. `https://genegauge-pgc-backend.onrender.com`.
+
+3. **Set `NEXT_PUBLIC_API_BASE_URL` in Vercel to the Render backend URL.**
+   In the Vercel project → Settings → Environment Variables, add
+   `NEXT_PUBLIC_API_BASE_URL=https://genegauge-pgc-backend.onrender.com`,
+   then redeploy the frontend so the build picks it up.
+
+4. **Set allowed CORS origins in the backend.**
+   In the Render service → Environment, set `GENEGAUGE_CORS_ORIGINS` to a
+   comma-separated list including your Vercel production domain, e.g.
+   `http://localhost:3000,https://genegauge-pgc.vercel.app`. Defaults to
+   localhost only if unset.
+
+Other backend env vars (`HF_TOKEN`, `SUPABASE_URL`/`SUPABASE_KEY`,
+`GENEGAUGE_DEMO_MODE`) can be set the same way; see `.env.example`.
+
+Local backend dev is unchanged — `uvicorn app.main:app --reload` from
+`backend/`, or `docker build -t genegauge-backend backend && docker run -p
+8000:8000 -e PORT=8000 genegauge-backend` to test the same image Render runs.
 
 ---
 
