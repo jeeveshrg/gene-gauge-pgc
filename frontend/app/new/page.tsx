@@ -11,7 +11,7 @@ import { Badge, Button, Card, Empty } from "@/components/ui";
 const schema = z
   .object({
     name: z.string().optional(),
-    datasets: z.array(z.string()).min(1, "Select at least one dataset."),
+    datasets: z.array(z.string()).min(2, "Select at least two datasets."),
     significance_method: z.enum(["genome_wide", "suggestive", "top_k", "custom"]),
     top_k: z.coerce.number().int().positive().optional(),
     custom_threshold: z.coerce.number().gt(0).lte(1).optional(),
@@ -45,7 +45,8 @@ export default function NewAnalysisPage() {
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      datasets: [],
+      name: "Simple demo comparison",
+      datasets: ["pgc-schizophrenia", "pgc-bipolar"],
       significance_method: "genome_wide",
       mapping_method: "window_10kb",
       run_enrichment: true,
@@ -59,12 +60,13 @@ export default function NewAnalysisPage() {
       try {
         const res = await api.datasets();
         setDatasets(res.datasets);
-        // Load the first config id per dataset for the selection payload.
-        const map: Record<string, string> = {};
-        for (const d of res.datasets) {
-          const c = await api.configs(d.dataset_id);
-          if (c.configs[0]) map[d.dataset_id] = c.configs[0].config_id;
-        }
+        const entries = await Promise.all(
+          res.datasets.map(async (d) => {
+            const c = await api.configs(d.dataset_id);
+            return [d.dataset_id, c.configs[0]?.config_id] as const;
+          }),
+        );
+        const map = Object.fromEntries(entries.filter(([, configId]) => !!configId));
         setConfigMap(map);
       } catch (e) {
         setLoadError(e instanceof Error ? e.message : String(e));
@@ -101,21 +103,21 @@ export default function NewAnalysisPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-xl font-semibold text-ink">New analysis</h1>
+        <h1 className="text-xl font-semibold text-ink">Start a simple comparison</h1>
         <p className="text-sm text-ink-muted mt-1">
-          Select two or more disorders to compare GWAS overlap. All parameters
-          are recorded for reproducibility.
+          Pick at least two conditions. The demo will use fake teaching data to
+          show which strong research markers and nearby genes overlap.
         </p>
       </div>
 
       {loadError && (
         <Card>
-          <Empty>Could not load datasets: {loadError}</Empty>
+          <Empty>Could not load the demo datasets: {loadError}</Empty>
         </Card>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <Card title="1. Datasets" subtitle="Choose the disorders to compare">
+        <Card title="1. Pick conditions" subtitle="Two are already selected for a quick demo">
           <div className="space-y-2">
             {datasets.map((d) => (
               <label
@@ -133,7 +135,7 @@ export default function NewAnalysisPage() {
                     {d.disorder}{" "}
                     <span className="coord text-ink-faint">{d.dataset_id}</span>
                   </div>
-                  <div className="text-xs text-ink-muted">{d.publication}</div>
+                  <div className="text-xs text-ink-muted">{d.description}</div>
                 </div>
               </label>
             ))}
@@ -143,10 +145,10 @@ export default function NewAnalysisPage() {
           )}
         </Card>
 
-        <Card title="2. Parameters">
+        <Card title="2. Keep or adjust the simple defaults">
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
-              <span className="text-xs font-medium text-ink-muted">Analysis name</span>
+              <span className="text-xs font-medium text-ink-muted">Result name</span>
               <input
                 {...register("name")}
                 placeholder="Optional label"
@@ -155,15 +157,15 @@ export default function NewAnalysisPage() {
             </label>
 
             <label className="block">
-              <span className="text-xs font-medium text-ink-muted">Significance</span>
+              <span className="text-xs font-medium text-ink-muted">Which markers count?</span>
               <select
                 {...register("significance_method")}
                 className="mt-1 w-full border border-line rounded-sm px-2 py-1.5 text-sm bg-surface"
               >
-                <option value="genome_wide">Genome-wide (p &lt; 5e-8)</option>
-                <option value="suggestive">Suggestive (p &lt; 1e-5)</option>
-                <option value="top_k">Top-k by p-value</option>
-                <option value="custom">Custom threshold</option>
+                <option value="genome_wide">Strongest signals only</option>
+                <option value="suggestive">Include more exploratory signals</option>
+                <option value="top_k">Top few markers by score</option>
+                <option value="custom">Custom cutoff</option>
               </select>
             </label>
 
@@ -200,22 +202,22 @@ export default function NewAnalysisPage() {
 
             <label className="block">
               <span className="text-xs font-medium text-ink-muted">
-                Variant-to-gene mapping
+                How should markers point to genes?
               </span>
               <select
                 {...register("mapping_method")}
                 className="mt-1 w-full border border-line rounded-sm px-2 py-1.5 text-sm bg-surface"
               >
-                <option value="gene_body">Gene body</option>
-                <option value="window_10kb">Gene body ±10 kb</option>
-                <option value="window_50kb">Gene body ±50 kb</option>
-                <option value="nearest">Nearest gene</option>
+                <option value="gene_body">Only markers inside a gene</option>
+                <option value="window_10kb">Nearby genes (simple default)</option>
+                <option value="window_50kb">Wider nearby-gene window</option>
+                <option value="nearest">Nearest teaching gene</option>
               </select>
             </label>
 
             <label className="flex items-center gap-2 sm:col-span-2">
               <input type="checkbox" {...register("run_enrichment")} />
-              <span className="text-sm text-ink">Run pathway enrichment (GO / Reactome)</span>
+              <span className="text-sm text-ink">Also group genes into simple teaching themes</span>
             </label>
           </div>
         </Card>
@@ -228,9 +230,9 @@ export default function NewAnalysisPage() {
 
         <div className="flex items-center gap-3">
           <Button type="submit" disabled={busy}>
-            {busy ? "Running analysis…" : "Create & run analysis"}
+            {busy ? "Running demo…" : "Run simple comparison"}
           </Button>
-          <Badge tone="info">Positional mapping ≠ causality</Badge>
+          <Badge tone="info">Fake data, not diagnosis</Badge>
         </div>
       </form>
     </div>

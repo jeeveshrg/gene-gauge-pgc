@@ -13,8 +13,9 @@ reproducible reports.
 > individual disorder risk is never predicted. Every result page and every
 > generated report states its limitations.
 
-The app runs **fully offline in demo mode** on bundled mock data — no Hugging
-Face token or Supabase project is required to try it.
+The app runs in a **self-contained Vercel demo mode** with fake teaching data —
+no Hugging Face token, Python backend, or Supabase project is required to try
+the public site.
 
 ---
 
@@ -67,8 +68,8 @@ Enrichr/gseapy); `gseapy`/`goatools` can be swapped in behind the same API.
 **Frontend:** Next.js (App Router) · TypeScript · Tailwind CSS · shadcn/ui-style
 components · React Hook Form · Zod.
 
-**Storage/deploy:** Supabase Postgres/Storage (optional) · Vercel (frontend) ·
-Render/Railway/Fly.io (backend).
+**Storage/deploy:** Vercel self-contained demo API · Supabase Postgres/Storage
+(optional) · Render/Railway/Fly.io backend for live Python data loading.
 
 ---
 
@@ -179,8 +180,12 @@ python scripts/run_demo_analysis.py
 
 ## Demo mode & live mode
 
-- **Demo mode** (default without `HF_TOKEN`): uses `backend/data/mock/*.csv` and
-  the bundled gene annotation / GMT. Analysis history is a local JSON file.
+- **Vercel demo mode** (default public deployment): uses fake teaching data in
+  the Next.js app routes. It is designed for simple public presentation and
+  plain-English walkthroughs without deploying the Python backend.
+- **Local Python demo mode** (default backend without `HF_TOKEN`): uses
+  `backend/data/mock/*.csv` and the bundled gene annotation / GMT. Analysis
+  history is a local JSON file.
 - **Live mode** (`HF_TOKEN` set, `GENEGAUGE_DEMO_MODE=0`): loads real
   OpenMed/PGC datasets via `datasets.load_dataset(repo, config, streaming=True)`;
   falls back transparently to mock data on any network/credential failure.
@@ -193,22 +198,28 @@ See `.env.example` for all variables.
 
 ## Deployment
 
-Frontend on Vercel, backend on Render as a Dockerized FastAPI web service
-(not a serverless function — the backend depends on duckdb, pyarrow, scipy,
-and matplotlib, which don't fit serverless size/runtime constraints).
+The simplest public deployment is **frontend-only on Vercel**. With
+`NEXT_PUBLIC_API_BASE_URL` unset, the Next.js app uses its built-in fake-data
+API routes and is ready for a simple public demo.
+
+To use the Python analysis backend with live data, deploy the backend on Render
+as a Dockerized FastAPI web service (not a serverless function — the backend
+depends on duckdb, pyarrow, scipy, and matplotlib, which don't fit serverless
+size/runtime constraints).
 
 1. **Deploy the frontend to Vercel.**
    Import this repo in Vercel, set the project root to `frontend/`, and
-   deploy. Framework preset: Next.js (auto-detected).
+   deploy. Framework preset: Next.js (auto-detected). Do not set
+   `NEXT_PUBLIC_API_BASE_URL` if you want the simple fake-data public demo.
 
-2. **Deploy the backend to Render as a Docker web service.**
+2. **Optional: deploy the backend to Render as a Docker web service.**
    In the Render dashboard, "New +" → "Web Service" → connect this repo.
    Render will pick up [`render.yaml`](./render.yaml) (root directory
    `backend/`, `Dockerfile` build, health check at `/api/health`). Alternatively
    configure manually: root directory `backend`, environment `Docker`.
    Note the resulting service URL, e.g. `https://genegauge-pgc-backend.onrender.com`.
 
-3. **Set `NEXT_PUBLIC_API_BASE_URL` in Vercel to the Render backend URL.**
+3. **Optional: point Vercel at the Render backend URL.**
    In the Vercel project → Settings → Environment Variables, add
    `NEXT_PUBLIC_API_BASE_URL=https://genegauge-pgc-backend.onrender.com`,
    then redeploy the frontend so the build picks it up.

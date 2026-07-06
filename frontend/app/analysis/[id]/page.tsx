@@ -4,6 +4,20 @@ import { use, useEffect, useState } from "react";
 import { AnalysisResult, api, fmtP } from "@/lib/api";
 import { Badge, Card, Empty, LimitationsNote, Stat } from "@/components/ui";
 
+const SIGNAL_LABELS: Record<string, string> = {
+  genome_wide: "Strongest signals",
+  suggestive: "Exploratory signals",
+  top_k: "Top markers",
+  custom: "Custom cutoff",
+};
+
+const MAPPING_LABELS: Record<string, string> = {
+  gene_body: "Inside genes",
+  window_10kb: "Nearby genes",
+  window_50kb: "Wider nearby window",
+  nearest: "Nearest gene",
+};
+
 export default function AnalysisPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [data, setData] = useState<AnalysisResult | null>(null);
@@ -30,6 +44,8 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
 
   const sig = data.params.significance;
   const mapp = data.params.mapping;
+  const displayId = data.id.startsWith("demo-") ? data.id.slice(0, 17) : data.id;
+  const strongestGenePair = data.gene_overlaps[0];
 
   return (
     <div className="space-y-6">
@@ -37,7 +53,7 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
         <div>
           <h1 className="text-xl font-semibold text-ink">
             {data.name || "Analysis"}{" "}
-            <span className="coord text-ink-faint text-sm">{data.id}</span>
+            <span className="coord text-ink-faint text-sm">{displayId}</span>
           </h1>
           <p className="text-sm text-ink-muted mt-1">
             {data.per_dataset.map((d) => d.disorder).join(" · ")}
@@ -51,32 +67,65 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
             target="_blank"
             rel="noreferrer"
           >
-            Markdown report
-          </a>
-          <a
-            className="text-sm text-accent underline"
-            href={api.reportUrl(data.id, "pdf")}
-            target="_blank"
-            rel="noreferrer"
-          >
-            PDF
+            Plain report
           </a>
         </div>
       </div>
 
+      <Card title="What happened?" subtitle="Plain-English takeaway">
+        <div className="space-y-3">
+          <p className="text-sm font-medium text-ink">
+            {data.plain_language?.headline ||
+              "The demo compared your selected fake research datasets."}
+          </p>
+          <ul className="list-disc pl-5 text-sm text-ink-muted space-y-1">
+            {(data.plain_language?.bullets || buildFallbackBullets(data)).map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <div className="border border-amber-200 bg-amber-50 rounded-sm p-3 text-xs text-amber-900">
+            {data.plain_language?.caveat ||
+              "These are teaching results from fake data. They are not medical or biological claims."}
+          </div>
+        </div>
+      </Card>
+
       <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
-        <Stat label="Disorders" value={data.per_dataset.length} />
-        <Stat label="Significance" value={sig.method} />
+        <Stat label="Groups compared" value={data.per_dataset.length} />
+        <Stat label="Marker rule" value={SIGNAL_LABELS[sig.method] || sig.method} />
         <Stat label="Threshold" value={sig.threshold ? fmtP(sig.threshold) : sig.k ?? "—"} />
-        <Stat label="Mapping" value={mapp.method} />
+        <Stat label="Gene rule" value={MAPPING_LABELS[mapp.method] || mapp.method} />
       </div>
+
+      {strongestGenePair && (
+        <Card title="Most shared nearby genes" subtitle="A quick read before the tables">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div>
+              <div className="text-xs uppercase text-ink-faint">Pair</div>
+              <div className="text-sm font-medium text-ink">
+                {strongestGenePair.disorder_a} vs {strongestGenePair.disorder_b}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs uppercase text-ink-faint">Shared genes</div>
+              <div className="text-sm font-medium text-ink">{strongestGenePair.n_shared}</div>
+            </div>
+            <div>
+              <div className="text-xs uppercase text-ink-faint">Names</div>
+              <div className="coord text-ink-muted">
+                {strongestGenePair.shared_genes.join(", ") || "none"}
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Per-dataset significant variants */}
       {data.per_dataset.map((d) => (
         <Card
           key={d.disorder}
-          title={`${d.disorder}`}
-          subtitle={`${d.n_significant} significant of ${d.n_total_variants} variants · ${d.n_genes} mapped genes · source: ${d.source}`}
+          title={`Signals found in ${d.disorder}`}
+          subtitle={`${d.n_significant} fake markers passed the rule · ${d.n_genes} nearby teaching genes`}
         >
           {d.normalization.warnings.length > 0 && (
             <div className="mb-2 text-xs text-amber-800">
@@ -128,7 +177,10 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
 
       {/* Variant overlap */}
       {data.variant_overlaps.length > 0 && (
-        <Card title="Pairwise variant overlap" subtitle="Shared significant variants between disorders">
+        <Card
+          title="Shared marker IDs"
+          subtitle="Marker IDs that appeared in more than one selected dataset"
+        >
           <div className="overflow-x-auto">
             <table className="data-table">
               <thead>
@@ -168,8 +220,8 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
       {/* Gene overlap */}
       {data.gene_overlaps.length > 0 && (
         <Card
-          title="Pairwise gene overlap"
-          subtitle="Positional candidate genes; hypergeometric enrichment with BH FDR"
+          title="Shared nearby genes"
+          subtitle="Teaching genes near the selected fake markers"
         >
           <div className="overflow-x-auto">
             <table className="data-table">
@@ -206,7 +258,10 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
       {/* Enrichment */}
       {data.enrichment.enabled &&
         Object.keys(data.enrichment.per_disorder).length > 0 && (
-          <Card title="Pathway enrichment" subtitle="Over-representation (GO:BP / Reactome), BH FDR">
+          <Card
+            title="Simple gene themes"
+            subtitle="Teaching themes built from the nearby genes"
+          >
             <div className="space-y-4">
               {Object.entries(data.enrichment.per_disorder).map(([disorder, res]) => (
                 <div key={disorder}>
@@ -250,4 +305,15 @@ export default function AnalysisPage({ params }: { params: Promise<{ id: string 
       <LimitationsNote items={data.limitations} />
     </div>
   );
+}
+
+function buildFallbackBullets(data: AnalysisResult) {
+  const best = data.gene_overlaps[0];
+  return [
+    `The app compared ${data.per_dataset.length} selected datasets.`,
+    best
+      ? `${best.disorder_a} and ${best.disorder_b} shared ${best.n_shared} nearby genes.`
+      : "No nearby-gene overlap was found.",
+    "Use the tables below for the detailed marker and gene lists.",
+  ];
 }

@@ -1,7 +1,16 @@
-// Typed client for the GeneGauge PGC backend API.
+// Typed client for GeneGauge PGC. In Vercel demo mode, requests go to the
+// same-origin Next API routes. Set NEXT_PUBLIC_API_BASE_URL to use a live
+// Python backend instead.
 
-export const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") || "http://localhost:8000";
+function getApiBase() {
+  const configured = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "");
+  if (configured) return configured;
+  if (typeof window !== "undefined") return "";
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3000";
+}
+
+export const API_BASE = getApiBase();
 
 // ---------------------------------------------------------------------------
 // Types
@@ -131,6 +140,11 @@ export interface AnalysisResult {
   };
   reproducibility: Record<string, unknown>;
   limitations: string[];
+  plain_language?: {
+    headline: string;
+    bullets: string[];
+    caveat: string;
+  };
   error?: string;
 }
 

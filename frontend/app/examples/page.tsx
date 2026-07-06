@@ -6,7 +6,7 @@ import { api } from "@/lib/api";
 import { Button, Card, Empty } from "@/components/ui";
 
 const EXAMPLE = {
-  name: "Demo: SCZ vs BIP vs MDD (genome-wide, ±10kb)",
+  name: "Ready-made three-condition demo",
   selections: [
     { dataset_id: "pgc-schizophrenia", config_id: "scz2022" },
     { dataset_id: "pgc-bipolar", config_id: "bip2021" },
@@ -40,18 +40,18 @@ export default function ExamplesPage() {
       <div>
         <h1 className="text-xl font-semibold text-ink">Examples</h1>
         <p className="text-sm text-ink-muted mt-1">
-          Run a pre-configured demo analysis on the bundled mock data.
+          Run a pre-configured comparison with fake teaching data.
         </p>
       </div>
 
       <Card
-        title="Three-disorder psychiatric overlap"
+        title="Three-condition overlap demo"
         subtitle="Schizophrenia · Bipolar Disorder · Major Depressive Disorder"
       >
         <ul className="text-sm text-ink-muted list-disc pl-5 space-y-1">
-          <li>Significance: genome-wide (p &lt; 5e-8)</li>
-          <li>Mapping: gene body ±10 kb</li>
-          <li>Pathway enrichment enabled (GO:BP / Reactome)</li>
+          <li>Uses the strongest fake marker signals from each dataset.</li>
+          <li>Maps markers to nearby teaching genes.</li>
+          <li>Groups genes into simple teaching themes.</li>
         </ul>
         <div className="mt-4">
           <Button onClick={runExample} disabled={busy}>
@@ -66,8 +66,8 @@ export default function ExamplesPage() {
       </Card>
 
       <div className="border border-amber-200 bg-amber-50 rounded-sm p-4 text-xs text-amber-900">
-        This example uses small bundled mock datasets. Results are illustrative
-        of the workflow only and carry no biological or clinical meaning.
+        This example uses small fake datasets. Results are illustrative only and
+        carry no biological or clinical meaning.
       </div>
     </div>
   );

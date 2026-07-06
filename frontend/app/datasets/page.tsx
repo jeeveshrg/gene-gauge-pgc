@@ -21,17 +21,16 @@ export default async function DatasetsPage() {
         <div>
           <h1 className="text-xl font-semibold text-ink">Datasets</h1>
           <p className="text-sm text-ink-muted mt-1">
-            Available PGC psychiatric GWAS summary-statistic datasets.
+            Fake teaching datasets available in the public Vercel demo.
           </p>
         </div>
-        {demo && <Badge tone="warn">Demo mode — bundled mock data</Badge>}
+        {demo && <Badge tone="warn">Demo mode — fake data</Badge>}
       </div>
 
       {error && (
         <Card>
           <Empty>
-            Could not reach the backend API ({error}). Start the backend and set{" "}
-            <code className="coord">NEXT_PUBLIC_API_BASE_URL</code>.
+            Could not load the demo API ({error}). Try refreshing the page.
           </Empty>
         </Card>
       )}

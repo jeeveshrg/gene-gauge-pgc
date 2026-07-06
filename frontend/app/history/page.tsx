@@ -17,7 +17,9 @@ export default async function HistoryPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-semibold text-ink">Analysis history</h1>
-        <p className="text-sm text-ink-muted mt-1">Previously run analyses.</p>
+        <p className="text-sm text-ink-muted mt-1">
+          The public demo keeps results in the URL, so history is intentionally temporary.
+        </p>
       </div>
 
       {error && (
@@ -29,7 +31,8 @@ export default async function HistoryPage() {
       {analyses && analyses.length === 0 && (
         <Card>
           <Empty>
-            No analyses yet. <Link className="text-accent underline" href="/new">Start one.</Link>
+            No saved analyses in this demo session.{" "}
+            <Link className="text-accent underline" href="/new">Start one.</Link>
           </Empty>
         </Card>
       )}
