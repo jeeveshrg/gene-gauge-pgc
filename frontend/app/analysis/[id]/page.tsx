@@ -1,22 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { AnalysisResult, api, fmtP } from "@/lib/api";
 import { Badge, Card, Empty, LimitationsNote, Stat } from "@/components/ui";
 
-export default function AnalysisPage({ params }: { params: { id: string } }) {
+export default function AnalysisPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [data, setData] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
-        setData(await api.getAnalysis(params.id));
+        setData(await api.getAnalysis(id));
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e));
       }
     })();
-  }, [params.id]);
+  }, [id]);
 
   if (error) return <Card><Empty>Could not load analysis: {error}</Empty></Card>;
   if (!data) return <Card><Empty>Loading analysis…</Empty></Card>;
