@@ -5,7 +5,7 @@ services:
     plan: free
     rootDir: backend
     dockerfilePath: ./Dockerfile
-    healthCheckPath: /health
+    healthCheckPath: /api/health
     envVars:
       - key: GENEGAUGE_DEMO_MODE
         value: "1"

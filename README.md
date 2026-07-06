@@ -204,7 +204,7 @@ and matplotlib, which don't fit serverless size/runtime constraints).
 2. **Deploy the backend to Render as a Docker web service.**
    In the Render dashboard, "New +" → "Web Service" → connect this repo.
    Render will pick up [`render.yaml`](./render.yaml) (root directory
-   `backend/`, `Dockerfile` build, health check at `/health`). Alternatively
+   `backend/`, `Dockerfile` build, health check at `/api/health`). Alternatively
    configure manually: root directory `backend`, environment `Docker`.
    Note the resulting service URL, e.g. `https://genegauge-pgc-backend.onrender.com`.
 
