@@ -11,6 +11,7 @@ venv/
 node_modules/
 .next/
 out/
+.vercel/
 npm-debug.log*
 next-env.d.ts
 *.tsbuildinfo
