@@ -1,5 +1,10 @@
 # GeneGauge PGC — Reproducible Psychiatric GWAS Overlap Explorer
 
+**Try the public demo:** [genegauge-pgc.vercel.app](https://genegauge-pgc.vercel.app)
+
+No coding or GitHub knowledge is needed to use the demo. Open the link, click
+**Start simple demo**, and run the preloaded fake-data comparison.
+
 GeneGauge PGC loads Psychiatric Genomics Consortium (PGC / OpenMed) **GWAS
 summary-statistic** datasets, normalizes their heterogeneous schemas, extracts
 significant variants, maps them to positional candidate genes, compares overlap
